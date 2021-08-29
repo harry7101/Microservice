@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,11 @@ namespace hotel_base.Controllers
     public class TestController : ControllerBase
     {
         private readonly ILogger _logger;
-
-        public TestController(ILoggerFactory loggerFactory)
+        IConfiguration _configuration;
+        public TestController(ILoggerFactory loggerFactory, IConfiguration configuration)
         {
             _logger = loggerFactory.CreateLogger<TestController>();
+            _configuration = configuration;
         }
 
         [HttpGet("TestLogSeq")]
@@ -27,7 +29,7 @@ namespace hotel_base.Controllers
             _logger.LogWarning("this is a test log for warning level .");
             _logger.LogError(new Exception("this is a ex for seq log ."), "this is a test log for error level .");
 
-            return "ok";
+            return _configuration["serviceInfo:port"];
         }
     }
 }

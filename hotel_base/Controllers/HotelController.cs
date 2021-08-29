@@ -12,6 +12,7 @@ namespace hotel_base.Controllers
     [Route("[controller]")]
     public class HotelController : ControllerBase
     {
+
         private static List<HotelVM> _hotels = new List<HotelVM>() { 
             new HotelVM{ 
                 Id="H8001",

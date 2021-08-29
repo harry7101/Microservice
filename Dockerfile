@@ -9,20 +9,17 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["api_gateway/api_gateway.csproj", "api_gateway/"]
 COPY ["hotel_base/hotel_base.csproj", "hotel_base/"]
 COPY ["common.libs/common.libs.csproj", "common.libs/"]
-COPY ["ordering/ordering.csproj", "ordering/"]
-COPY ["member_center/member_center.csproj", "member_center/"]
-RUN dotnet restore "api_gateway/api_gateway.csproj"
+RUN dotnet restore "hotel_base/hotel_base.csproj"
 COPY . .
-WORKDIR "/src/api_gateway"
-RUN dotnet build "api_gateway.csproj" -c Release -o /app/build
+WORKDIR "/src/hotel_base"
+RUN dotnet build "hotel_base.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "api_gateway.csproj" -c Release -o /app/publish
+RUN dotnet publish "hotel_base.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "api_gateway.dll"]
+ENTRYPOINT ["dotnet", "hotel_base.dll"]

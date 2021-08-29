@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Winton.Extensions.Configuration.Consul;
 
 namespace hotel_base
 {
@@ -39,14 +40,37 @@ namespace hotel_base
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+
                     var localconfig = new ConfigurationBuilder()
                                   .SetBasePath(Directory.GetCurrentDirectory())
                                   .AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
-                    var urls = localconfig["urls"];
-                    webBuilder.ConfigureKestrel(options =>
-                    {
-                        options.ListenAnyIP(6003);
+                    var consul_server = localconfig["consul_server"];
+
+                    webBuilder.ConfigureAppConfiguration((ctx, cfg) => {
+                      
+                      
+                        cfg.AddConsul("hoteljson", op =>
+                        {
+                            op.ConsulConfigurationOptions = cco =>
+                            {
+                                cco.Address = new Uri(consul_server);
+
+                            };
+                            op.ReloadOnChange = false;//是否热更新
+
+                        });
+
+                        localconfig = cfg.Build();
+                        var port = localconfig["serviceInfo:port"];
+
+
+                        webBuilder.ConfigureKestrel(options =>
+                        {
+                            options.ListenAnyIP(int.Parse(port));
+                        });
                     });
+           
+                   
                     webBuilder.UseStartup<Startup>();
                    // webBuilder.UseUrls("http://*:6003");
                 })

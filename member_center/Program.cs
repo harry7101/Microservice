@@ -55,10 +55,12 @@ namespace member_center
                             op.ReloadOnChange = true;
           
                         });
+
+
                     });
                     webBuilder.ConfigureKestrel(options =>
                     {
-                        options.ListenAnyIP(6002);
+                        options.ListenAnyIP(6006);
                     });
                     webBuilder.UseStartup<Startup>();
                 });
