@@ -39,12 +39,18 @@ namespace hotel_base
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    var localconfig = new ConfigurationBuilder()
+                                  .SetBasePath(Directory.GetCurrentDirectory())
+                                  .AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
+                    var urls = localconfig["urls"];
                     webBuilder.ConfigureKestrel(options =>
                     {
                         options.ListenAnyIP(6003);
                     });
                     webBuilder.UseStartup<Startup>();
+                   // webBuilder.UseUrls("http://*:6003");
                 })
+            
                 .UseNLog();
     }
 }

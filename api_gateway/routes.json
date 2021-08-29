@@ -1,89 +1,67 @@
 {
   "Routes": [
     {
-      //获取酒店列表
+
       "UpstreamPathTemplate": "/api/hotel",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/hotel",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          //hotel service
-          "Host": "localhost",
-          "Port": 6003
-        }
-      ],
+      "ServiceName": "hotel_base",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      },
       "RateLimitOptions": {
         "EnableRateLimiting": true,
         "Period": "1s",
         "PeriodTimespan": 1,
-        "Limit": 1
+        "Limit": 10
       }
     },
     {
-      //获取单个酒店
+
       "UpstreamPathTemplate": "/api/hotel/{hotel_id}",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/hotel/{hotel_id}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          //hotel service
-          "Host": "localhost",
-          "Port": 6003
-        }
-      ],
-      "Key": "hotel_base_info",
-      //缓存5s
-      "FileCacheOptions": { "TtlSeconds": 5 }
+      "ServiceName": "hotel_base",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      }
     },
     {
-      //获取酒店房间列表
-      "UpstreamPathTemplate": "/api/hotel_rooms/{hotel_id}",
-      "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/room/hotel_rooms/{hotel_id}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          //hotel service
-          "Host": "localhost",
-          "Port": 6003
-        }
-      ],
-      "Key": "hotel_rooms"
-    },
-    {
-      //获取查询订单
+
       "UpstreamPathTemplate": "/api/order/query?day={day}",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/order/get_orders?day={day}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          //order service
-          "Host": "localhost",
-          "Port": 6001
-        }
-      ]
-    }
-  ],
-  "Aggregates": [
-    {
-      //聚合 查询酒店信息跟酒店房间列表
-      "RouteKeys": [
-        "hotel_base_info",
-        "hotel_rooms"
-      ],
-      "UpstreamPathTemplate": "/api/hotel_detail/{hotel_id}"
+      "ServiceName": "ordering",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      }
+
     },
     {
-      //聚合 查询酒店信息跟酒店房间列表 移动端 裁剪
-      "RouteKeys": [
-        "hotel_base_info",
-        "hotel_rooms"
-      ],
-      "UpstreamPathTemplate": "/api/m/hotel_detail/{hotel_id}",
-      "Aggregator": "HotelDetailInfoForMobileAggregator"
+
+      "UpstreamPathTemplate": "/api/order/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/order/{id}",
+      "DownstreamScheme": "http",
+      "ServiceName": "ordering",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      }
+
     }
-  ]
+  ],
+  "GlobalConfiguration": {
+    "RequestIdKey": null,
+    "ServiceDiscoveryProvider": {
+      "Host": "192.168.1.3",
+      "Port": 8500,
+      "Type": "Consul",
+      "Token": null,
+      "ConfigurationKey": null
+    }
+  }
 }
+   
